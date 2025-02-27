@@ -15,7 +15,7 @@ const TOKEN_PDA = new PublicKey("Bv773jeAs3nsU9NnUM8pYWAXsggqp2NCtpuMzSS3E1fg");
 export const MintButton = () => {
     const { connection } = useConnection();
     const wallet = useAnchorWallet();
-    const [amount, setAmount] = useState<string>("1000"); // Số token muốn mint
+
     const [txHash, setTxHash] = useState<string | null>(null);
     const [balance, setBalance] = useState<string | null>(null); // Số dư token
     const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ export const MintButton = () => {
             console.log("Controller PDA:", controllerPda.toBase58());
             console.log("Token  :", TOKEN_PDA.toBase58());
             console.log("Program:", PROGRAM_ID.toBase58());
-
+            let amount = 1000 * 1e6;
             const tx = await program.methods
                 .mint(new anchor.BN(amount))
                 .accountsPartial({
@@ -88,8 +88,6 @@ export const MintButton = () => {
             // Cập nhật số dư sau khi mint
             const updatedAccount = await getAccount(connection, ata);
             setBalance(updatedAccount.amount.toString());
-
-            alert(`Minted ${amount} tokens! Tx: ${tx}`);
         } catch (err) {
             console.error("Error minting token:", err);
             alert("Failed to mint token. Check console for details.");
@@ -105,15 +103,9 @@ export const MintButton = () => {
                 <p>
                     Current Balance: {balance !== null ? `${(Number(balance) / 1e6).toFixed(2)} tokens` : "Loading..."}
                 </p>
-                <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Amount to mint"
-                    disabled={loading}
-                />
+
                 <button onClick={mintToken} disabled={!wallet || loading}>
-                    {loading ? "Minting..." : "Mint Token"}
+                    {loading ? "Minting..." : "Mint 1000 Token"}
                 </button>
                 {txHash && (
                     <p>
