@@ -109,7 +109,9 @@ export const MintButton = () => {
         <div>
             <WalletMultiButton />
             <div style={{ marginTop: "20px" }}>
-                <p>Current Balance: {balance !== null ? `${balance} tokens` : "Loading..."}</p>
+                <p>
+                    Current Balance: {balance !== null ? `${(Number(balance) / 1e6).toFixed(2)} tokens` : "Loading..."}
+                </p>
                 <input
                     type="number"
                     value={amount}
