@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
+import { Program, AnchorProvider } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
-import {
-    TOKEN_PROGRAM_ID,
-    getOrCreateAssociatedTokenAccount,
-    getAccount,
-    getAssociatedTokenAddress,
-    createAssociatedTokenAccount,
-    createAssociatedTokenAccountInstruction,
-} from "@solana/spl-token";
+import { getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import idl from "../idl/token_devnet.json"; // File IDL từ Anchor
 import { TokenDevnet } from "../types/token_devnet";
