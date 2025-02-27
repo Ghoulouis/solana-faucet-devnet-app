@@ -34,21 +34,19 @@ export const MintButton = () => {
                 setBalance(null);
                 return;
             }
+            const ata = await getAssociatedTokenAddress(
+                TOKEN_PDA, // Mint
+                wallet.publicKey, // Owner,
+                false
+            );
 
             try {
-                console.log("ATA:");
-                const ata = await getAssociatedTokenAddress(
-                    TOKEN_PDA, // Mint
-                    wallet.publicKey // Owner
-                );
-
                 console.log("ATA:", ata);
-
                 const accountInfo = await getAccount(connection, ata);
                 setBalance(accountInfo.amount.toString());
             } catch (err) {
-                console.error("Error fetching balance:", err);
-                setBalance("Error");
+                // Nếu không có ATA thì tạo mới
+                setBalance("0");
             }
         };
 
@@ -73,43 +71,22 @@ export const MintButton = () => {
             const controllerPda = PublicKey.findProgramAddressSync([Buffer.from(CONTROLLER_SEED)], PROGRAM_ID)[0];
             const ata = await getAssociatedTokenAddress(
                 TOKEN_PDA, // Mint
-                wallet.publicKey // Owner
+                wallet.publicKey
+                // Owner,
             );
-            // Tạo hoặc lấy ATA
-            try {
-                const ata = await getAssociatedTokenAddress(
-                    TOKEN_PDA, // Mint
-                    wallet.publicKey // Owner
-                );
-            } catch (err) {
-                const transaction = new web3.Transaction().add(
-                    web3.SystemProgram.createAccount({
-                        fromPubkey: wallet.publicKey,
-                        newAccountPubkey: ata,
-                        space: 165,
-                        lamports: await connection.getMinimumBalanceForRentExemption(165),
-                        programId: TOKEN_PROGRAM_ID,
-                    })
-                );
 
-                const txSignature = await connection.se(transaction);
+            console.log("ATA:", ata.toBase58());
+            console.log("Controller PDA:", controllerPda.toBase58());
+            console.log("Token  :", TOKEN_PDA.toBase58());
+            console.log("Program:", PROGRAM_ID.toBase58());
 
-                await connection.send(txSignature, "confirmed");
-
-                console.log("ATA created:", txSignature);
-                setBalance("0");
-            }
-
-            // Gọi hàm mintToken từ contract
             const tx = await program.methods
                 .mint(new anchor.BN(amount))
                 .accountsPartial({
                     signer: wallet.publicKey,
-                    signerAta: ata,
                     controller: controllerPda,
                     token: TOKEN_PDA,
-                    tokenProgram: TOKEN_PROGRAM_ID,
-                    systemProgram: web3.SystemProgram.programId,
+                    signerAta: ata,
                 })
                 .rpc();
 
